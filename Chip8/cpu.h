@@ -22,7 +22,7 @@ class Cpu
 
 	
 	private:
-		void loadROM();
+		void loadROM(std::string filename);
 
 
 
