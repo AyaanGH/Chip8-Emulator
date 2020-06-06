@@ -27,6 +27,19 @@ class Cpu
 		
 		Cpu();
 
+
+		//OPCODES
+
+		 void OP_00E0();
+
+		 void OP_1nnn();
+
+		 void OP_2nnn();
+
+		 void OP_3xkk();
+
+		 void OP_5xy0();
+
 		
 
 	private:

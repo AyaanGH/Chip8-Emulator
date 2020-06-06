@@ -95,3 +95,73 @@ void Cpu::loadROM(std::string filename)
 
 
 }
+
+
+//CLS-Clear Display
+void Cpu::OP_00E0()
+{
+	memset(video, 0, sizeof(video));
+}
+
+
+//RET-Return from subroutine
+
+void Cpu::OP_00E0()
+{
+	--stackPointer;
+	programCounter = stack[stackPointer];
+
+}
+
+//JP addr - Jump to address nnn
+
+void Cpu::OP_1nnn()
+{
+
+	programCounter = opcode & 0x0FFFu;
+
+}
+
+
+//CALL addr - Call subroutine at addr 2nnn
+
+void Cpu::OP_2nnn()
+{
+	stack[stackPointer] = programCounter;
+
+	++stackPointer;
+
+	programCounter = opcode & 0x0FFFu;
+
+
+}
+
+
+//SE Vx, byte - Skip next instruction if Vx = kk.
+
+
+void Cpu::OP_3xkk()
+{
+
+	uint8_t vx = (opcode & 0x0F00u) >> 8u;
+	uint8_t hex_byte = opcode & 0x00FFu;
+	if (registers[vx] == hex_byte)
+	{
+		programCounter += 2;
+	}
+}
+
+
+
+//SE Vx, Vy - Skip next instruction if Vx = Vy.
+void Cpu::OP_5xy0()
+
+{
+	uint8_t vx = (opcode & 0x0F00u) >> 8u;
+	uint8_t vy = (opcode & 0x00F0u) >> 4u;
+
+	if (registers[vx] == registers[vy])
+	{
+		programCounter += 2;
+	}
+}
