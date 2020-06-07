@@ -152,6 +152,21 @@ void Cpu::OP_3xkk()
 }
 
 
+//SNE Vx, byte - Skip next instruction if Vx != kk.
+
+void Cpu::OP_4xkk()
+{
+
+	uint8_t vx = (opcode & 0x0F00u) >> 8;
+
+	uint8_t kk = (opcode & 0x00FFu);
+
+	if (registers[vx] != kk)
+	{
+		programCounter += 2;
+	}
+}
+
 
 //SE Vx, Vy - Skip next instruction if Vx = Vy.
 void Cpu::OP_5xy0()
@@ -164,4 +179,120 @@ void Cpu::OP_5xy0()
 	{
 		programCounter += 2;
 	}
+}
+
+//LD Vx, byte - Set Vx = kk
+
+void Cpu::OP_6xkk()
+{
+	uint8_t vx = (opcode & 0x0F00u) >> 8u;
+	uint8_t kk = (opcode & 0x00FFu);
+
+	registers[vx] = kk;
+
+}
+
+//7xkk - ADD Vx, byte - Set Vx = Vx + kk.
+
+void Cpu::OP_7xkk()
+{
+
+	uint8_t vx = (opcode & 0x0F00u) >> 8u;
+	uint8_t kk = (opcode & 0x00FFu);
+
+	registers[vx] += kk;
+
+}
+
+
+//8xy0 - LD Vx, Vy - Set Vx = Vy.
+
+void Cpu::OP_8ky0()
+{
+
+	uint8_t vx = (opcode & 0x0F00u) >> 8u;
+	uint8_t vy = (opcode & 0x00F0u) >> 4u;
+
+	registers[vx] = registers[vy];
+}
+
+
+//8xy1 - OR Vx, Vy - Set Vx = Vx OR Vy.
+
+void Cpu::OP_8ky1()
+{
+	uint8_t vx = (opcode & 0x0F00u) >> 8u;
+	uint8_t vy = (opcode & 0x00F0u) >> 4u;
+
+	registers[vx] |= registers[vy];
+}
+
+
+//8xy2 - AND Vx, Vy- Set Vx = Vx AND Vy.
+
+void Cpu::OP_8ky2()
+{
+	uint8_t vx = (opcode & 0x0F00u) >> 8u;
+	uint8_t vy = (opcode & 0x00F0u) >> 4u;
+
+	registers[vx] &= registers[vy];
+}
+
+
+//8xy3 - XOR Vx, Vy - Set Vx = Vx XOR Vy.
+
+void Cpu::OP_8ky3()
+{
+	uint8_t vx = (opcode & 0x0F00u) >> 8u;
+	uint8_t vy = (opcode & 0x00F0u) >> 4u;
+
+	registers[vx] ^= registers[vy];
+}
+
+
+//8xy4 - ADD Vx, Vy
+
+
+void Cpu::OP_8ky4()
+{
+	uint8_t vx = (opcode & 0x0F00u) >> 8u;
+	uint8_t vy = (opcode & 0x00F0u) >> 4u;
+
+	uint16_t sum = registers[vx] + registers[vy];
+
+
+	if (sum > 255u)
+	{
+		registers[0xF] = 1;
+	}
+	
+	else
+	{
+		registers[0xF] = 0;
+	}
+
+	registers[vx] = sum & 0xFFu;
+}
+
+
+//8xy5 - SUB Vx, Vy - Set Vx = Vx - Vy, set VF = NOT borrow.
+
+void Cpu::OP_8ky5()
+{
+	uint8_t vx = (opcode & 0x0F00u) >> 8u;
+	uint8_t vy = (opcode & 0x00F0u) >> 4u;
+
+
+
+	if (registers[vx] > registers[vy]) 
+	{
+		registers[0xF] = 1;
+	}
+
+	else
+	{
+		registers[0xF] = 0;
+	}
+
+	registers[vx] -= registers[vy];
 }

@@ -38,7 +38,40 @@ class Cpu
 
 		 void OP_3xkk();
 
+		 void OP_4xkk();
+
 		 void OP_5xy0();
+
+		 void OP_6xkk();
+
+		 void OP_7xkk();
+
+		 void OP_8ky0();
+
+		 void OP_8ky1();
+
+		 void OP_8ky2();
+
+		 void OP_8ky3();
+
+		 void OP_8ky4();
+
+		 void OP_8ky5();
+
+		 void OP_8ky6();
+
+		 void OP_8ky7();
+
+		 void OP_8kyE();
+
+		 void OP_9xy0();
+
+		 void OP_Annn();
+
+		 void OP_Bnnn();
+
+		 void OP_Cxkk();
+
 
 		
 
