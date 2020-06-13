@@ -296,3 +296,57 @@ void Cpu::OP_8ky5()
 
 	registers[vx] -= registers[vy];
 }
+
+
+//8xy6 - SHR Vx - Set Vx = Vx SHR 1.
+
+
+void Cpu::OP_8ky6()
+{
+	uint8_t vx = (opcode & 0x0F00u) >> 8u;
+
+	registers[0xF] = (registers[vx] & 0x1u);
+
+	registers[vx] >>= 1;
+
+
+
+}
+
+
+//8xy7 - SUBN Vx, Vy- Set Vx = Vy - Vx, set VF = NOT borrow.
+
+
+void Cpu::OP_8xy7()
+{
+	
+	uint8_t vx = (opcode & 0x0F00u) >> 8u;
+	uint8_t vy = (opcode & 0x00F0u) >> 4u; 
+
+
+	if (registers[vy] > registers[vx])
+	{
+		registers[0xF] = 1;
+	}
+
+	else
+	{
+		registers[0xF] = 0;
+	}
+
+	registers[vx] = registers[vy] - registers[vx];
+}
+
+
+
+//8xyE - SHL Vx - Set Vx = Vx SHL 1.
+void Cpu::OP_8xyE()
+{
+
+//	uint8_t vx = (opcode & 0x0F00u) >> 8u;
+
+	//registers[0xF] = registers[vx] & 0x1
+
+//	registers[vx] <<=  1;
+//
+}

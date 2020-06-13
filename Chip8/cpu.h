@@ -60,9 +60,9 @@ class Cpu
 
 		 void OP_8ky6();
 
-		 void OP_8ky7();
+		 void OP_8xy7();
 
-		 void OP_8kyE();
+		 void OP_8xyE();
 
 		 void OP_9xy0();
 
