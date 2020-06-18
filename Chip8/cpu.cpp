@@ -343,10 +343,63 @@ void Cpu::OP_8xy7()
 void Cpu::OP_8xyE()
 {
 
-//	uint8_t vx = (opcode & 0x0F00u) >> 8u;
+	uint8_t vx = (opcode & 0x0F00u) >> 8u;
 
-	//registers[0xF] = registers[vx] & 0x1
+	registers[0xF] = (registers[vx] & 0x80u) >> 7;
 
-//	registers[vx] <<=  1;
-//
+    registers[vx] <<=  1;
+
 }
+
+
+//9xy0 - SNE Vx, Vy, Skip next instruction if Vx != Vy.
+
+
+void Cpu::OP_9xy0()
+{
+	uint8_t vx = (opcode & 0x0F00u) >> 8u;
+	uint8_t vy = (opcode & 0x00F0u) >> 4u;
+
+	if (registers[vx] != registers[vy])
+	{
+		programCounter += 2;
+	}
+}
+
+
+
+//Annn - LD I, addr, Set I = nnn.
+
+
+void Cpu::OP_Annn()
+{
+	indexRegister = (opcode & 0x0FFFu);
+}
+
+
+//Bnnn - JP V0, addr, Jump to location nnn + V0.
+
+
+void Cpu::OP_Bnnn()
+{
+	uint16_t address = opcode & 0x0FFFu;
+
+	programCounter += registers[0] + address;
+}
+
+
+
+//Cxkk - RND Vx, byte, Set Vx = random byte AND kk.
+
+void Cpu::OP_Cxkk()
+{
+
+	uint8_t vx = (opcode & 0x0F00u) >> 8u;
+
+	uint8_t kk = (opcode & 0x00FFu);
+
+	registers[vx] = randByte(randomEngine) & kk;
+
+}
+
+
