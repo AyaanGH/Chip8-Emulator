@@ -6,8 +6,8 @@ class Cpu
 {
 
 
-	//Public data members
-	public:
+	//private data members
+	private:
 
 		uint8_t registers[16]; //Registers
 		uint8_t memory[0xFFF];
@@ -25,12 +25,31 @@ class Cpu
 
 		std::uniform_int_distribution<uint8_t> randByte;
 		
-		Cpu();
+		
+
+
+		void Table0();
+		void Table8();
+		void TableE();
+		void TableF();
+
+
+		typedef void (Cpu::* Chip8Func)();
+		Chip8Func table[0xF + 1]{ &Cpu::OP_NULL };
+		Chip8Func table0[0xE + 1]{ &Cpu::OP_NULL };
+		Chip8Func table8[0xE + 1]{ &Cpu::OP_NULL };
+		Chip8Func tableE[0xE + 1]{ &Cpu::OP_NULL };
+		Chip8Func tableF[0x65 + 1]{ &Cpu::OP_NULL };
+
 
 
 		//OPCODES
 
+		 void OP_NULL();
+
 		 void OP_00E0();
+
+		 void OP_00EE();
 
 		 void OP_1nnn();
 
@@ -46,19 +65,19 @@ class Cpu
 
 		 void OP_7xkk();
 
-		 void OP_8ky0();
+		 void OP_8xy0();
 
-		 void OP_8ky1();
+		 void OP_8xy1();
 
-		 void OP_8ky2();
+		 void OP_8xy2();
 
-		 void OP_8ky3();
+		 void OP_8xy3();
 
-		 void OP_8ky4();
+		 void OP_8xy4();
 
-		 void OP_8ky5();
+		 void OP_8xy5();
 
-		 void OP_8ky6();
+		 void OP_8xy6();
 
 		 void OP_8xy7();
 
@@ -101,8 +120,11 @@ class Cpu
 
 		
 
-	private:
+	public:
 		void loadROM(std::string filename);
+		Cpu();
+		void Cycle();
+
 
 
 

@@ -51,10 +51,80 @@ Cpu::Cpu()
 
 	randByte = std::uniform_int_distribution<uint8_t>(0, 255U);
 
+
+
+	// Set up function pointer table
+	table[0x0] = &Cpu::Table0;
+	table[0x1] = &Cpu::OP_1nnn;
+	table[0x2] = &Cpu::OP_2nnn;
+	table[0x3] = &Cpu::OP_3xkk;
+	table[0x4] = &Cpu::OP_4xkk;
+	table[0x5] = &Cpu::OP_5xy0;
+	table[0x6] = &Cpu::OP_6xkk;
+	table[0x7] = &Cpu::OP_7xkk;
+	table[0x8] = &Cpu::Table8;
+	table[0x9] = &Cpu::OP_9xy0;
+	table[0xA] = &Cpu::OP_Annn;
+	table[0xB] = &Cpu::OP_Bnnn;
+	table[0xC] = &Cpu::OP_Cxkk;
+	table[0xD] = &Cpu::OP_Dxyn;
+	table[0xE] = &Cpu::TableE;
+	table[0xF] = &Cpu::TableF;
+
+	table0[0x0] = &Cpu::OP_00E0;
+	table0[0xE] = &Cpu::OP_00EE;
+
+	table8[0x0] = &Cpu::OP_8xy0;
+	table8[0x1] = &Cpu::OP_8xy1;
+	table8[0x2] = &Cpu::OP_8xy2;
+	table8[0x3] = &Cpu::OP_8xy3;
+	table8[0x4] = &Cpu::OP_8xy4;
+	table8[0x5] = &Cpu::OP_8xy5;
+	table8[0x6] = &Cpu::OP_8xy6;
+	table8[0x7] = &Cpu::OP_8xy7;
+	table8[0xE] = &Cpu::OP_8xyE;
+
+	tableE[0x1] = &Cpu::OP_ExA1;
+	tableE[0xE] = &Cpu::OP_Ex9E;
+
+	tableF[0x07] = &Cpu::OP_Fx07;
+	tableF[0x0A] = &Cpu::OP_Fx0A;
+	tableF[0x15] = &Cpu::OP_Fx15;
+	tableF[0x18] = &Cpu::OP_Fx18;
+	tableF[0x1E] = &Cpu::OP_Fx1E;
+	tableF[0x29] = &Cpu::OP_Fx29;
+	tableF[0x33] = &Cpu::OP_Fx33;
+	tableF[0x55] = &Cpu::OP_Fx55;
+	tableF[0x65] = &Cpu::OP_Fx65;
+
 	
 
 
 }
+
+void Cpu::Table0()
+{
+	((*this).*(table0[opcode & 0x000Fu]))();
+}
+
+void Cpu::Table8()
+{
+	((*this).*(table8[opcode & 0x000Fu]))();
+}
+
+void Cpu::TableE()
+{
+	((*this).*(tableE[opcode & 0x000Fu]))();
+}
+
+void Cpu::TableF()
+{
+	((*this).*(tableF[opcode & 0x00FFu]))();
+}
+
+
+void Cpu::OP_NULL()
+{}
 
 
 
@@ -97,6 +167,36 @@ void Cpu::loadROM(std::string filename)
 }
 
 
+
+void Cpu::Cycle()
+{
+	// Fetch
+	opcode = (memory[programCounter] << 8u) | memory[programCounter + 1];
+
+	// Increment the PC before we execute anything
+	programCounter += 2;
+
+	// Decode and Execute
+	((*this).*(table[(opcode & 0xF000u) >> 12u]))();
+
+	// Decrement the delay timer if it's been set
+	if (delayTimer > 0)
+	{
+		--delayTimer;
+	}
+
+	// Decrement the sound timer if it's been set
+	if (soundTimer > 0)
+	{
+		--soundTimer;
+	}
+}
+
+
+
+
+
+
 //CLS-Clear Display
 void Cpu::OP_00E0()
 {
@@ -106,7 +206,7 @@ void Cpu::OP_00E0()
 
 //RET-Return from subroutine
 
-void Cpu::OP_00E0()
+void Cpu::OP_00EE()
 {
 	--stackPointer;
 	programCounter = stack[stackPointer];
@@ -207,7 +307,7 @@ void Cpu::OP_7xkk()
 
 //8xy0 - LD Vx, Vy - Set Vx = Vy.
 
-void Cpu::OP_8ky0()
+void Cpu::OP_8xy0()
 {
 
 	uint8_t vx = (opcode & 0x0F00u) >> 8u;
@@ -219,7 +319,7 @@ void Cpu::OP_8ky0()
 
 //8xy1 - OR Vx, Vy - Set Vx = Vx OR Vy.
 
-void Cpu::OP_8ky1()
+void Cpu::OP_8xy1()
 {
 	uint8_t vx = (opcode & 0x0F00u) >> 8u;
 	uint8_t vy = (opcode & 0x00F0u) >> 4u;
@@ -230,7 +330,7 @@ void Cpu::OP_8ky1()
 
 //8xy2 - AND Vx, Vy- Set Vx = Vx AND Vy.
 
-void Cpu::OP_8ky2()
+void Cpu::OP_8xy2()
 {
 	uint8_t vx = (opcode & 0x0F00u) >> 8u;
 	uint8_t vy = (opcode & 0x00F0u) >> 4u;
@@ -241,7 +341,7 @@ void Cpu::OP_8ky2()
 
 //8xy3 - XOR Vx, Vy - Set Vx = Vx XOR Vy.
 
-void Cpu::OP_8ky3()
+void Cpu::OP_8xy3()
 {
 	uint8_t vx = (opcode & 0x0F00u) >> 8u;
 	uint8_t vy = (opcode & 0x00F0u) >> 4u;
@@ -253,7 +353,7 @@ void Cpu::OP_8ky3()
 //8xy4 - ADD Vx, Vy
 
 
-void Cpu::OP_8ky4()
+void Cpu::OP_8xy4()
 {
 	uint8_t vx = (opcode & 0x0F00u) >> 8u;
 	uint8_t vy = (opcode & 0x00F0u) >> 4u;
@@ -277,7 +377,7 @@ void Cpu::OP_8ky4()
 
 //8xy5 - SUB Vx, Vy - Set Vx = Vx - Vy, set VF = NOT borrow.
 
-void Cpu::OP_8ky5()
+void Cpu::OP_8xy5()
 {
 	uint8_t vx = (opcode & 0x0F00u) >> 8u;
 	uint8_t vy = (opcode & 0x00F0u) >> 4u;
@@ -301,7 +401,7 @@ void Cpu::OP_8ky5()
 //8xy6 - SHR Vx - Set Vx = Vx SHR 1.
 
 
-void Cpu::OP_8ky6()
+void Cpu::OP_8xy6()
 {
 	uint8_t vx = (opcode & 0x0F00u) >> 8u;
 
