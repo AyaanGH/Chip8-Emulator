@@ -1,29 +1,52 @@
 // Chip8.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
 
+#include "cpu.h"
+#include "Platform.h"
+#include <chrono>
 #include <iostream>
-#include <array>
 
 
-
-int main()
+int main(int argc, char** argv)
 {
+	if (argc != 4)
+	{
+		std::cerr << "Usage: " << argv[0] << " <Scale> <Delay> <ROM>\n";
+		std::exit(EXIT_FAILURE);
+	}
 
+	int videoScale = std::stoi(argv[1]);
+	int cycleDelay = std::stoi(argv[2]);
+	char const* romFilename = argv[3];
 
-	unsigned char v[16] = "hello";
+	Platform platform("CHIP-8 Emulator", VIDEO_WIDTH * videoScale, VIDEO_HEIGHT * videoScale, VIDEO_WIDTH, VIDEO_HEIGHT);
 
-	
-	
+	Cpu chip8;
+	chip8.loadROM(romFilename);
 
+	int videoPitch = sizeof(chip8.video[0]) * VIDEO_WIDTH;
 
-	
+	auto lastCycleTime = std::chrono::high_resolution_clock::now();
+	bool quit = false;
 
-	std::cout << v;
+	while (!quit)
+	{
+		quit = platform.ProcessInput(chip8.keypad);
 
+		auto currentTime = std::chrono::high_resolution_clock::now();
+		float dt = std::chrono::duration<float, std::chrono::milliseconds::period>(currentTime - lastCycleTime).count();
 
-	
+		if (dt > cycleDelay)
+		{
+			lastCycleTime = currentTime;
 
-    std::cout << "Hello World!\n";
+			chip8.Cycle();
+
+			platform.Update(chip8.video, videoPitch);
+		}
+	}
+
+	return 0;
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu

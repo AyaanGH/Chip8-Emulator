@@ -7,7 +7,7 @@ class Cpu
 
 
 	//private data members
-	private:
+	public:
 
 		uint8_t registers[16]; //Registers
 		uint8_t memory[0xFFF];
@@ -120,7 +120,7 @@ class Cpu
 
 		
 
-	public:
+	//public:
 		void loadROM(std::string filename);
 		Cpu();
 		void Cycle();
