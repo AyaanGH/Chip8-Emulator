@@ -1,3 +1,4 @@
+//https://austinmorlan.com/posts/chip8_emulator/
 #pragma once
 
 #include <cstdint>

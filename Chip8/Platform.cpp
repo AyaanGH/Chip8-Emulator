@@ -1,3 +1,5 @@
+//https://austinmorlan.com/posts/chip8_emulator/
+
 #include "Platform.h"
 //#include <SDL2/SDL.h>
 #include "SDL.h"
